@@ -141,19 +141,15 @@ function CitiesList (settings){
 		_init();
 	} else {//load data from URL
 		$.ajax({
-            cache: false,
-            dataType: "json",
-            url: settings.dataUrl,
-            method: "GET",
-            success: function(response){
-                _data=response;
-                console.log(_data);
-                _init();
-            },
-            error: function(jqXHR, exception, errorThrown){
-                //throwError('Data load has been failed!</h2> <h2>Error details: ('+jqXHR.status+') '+errorThrown)
-            }
-		});
+                  cache: false,
+                  dataType: "json",
+                  url: settings.dataUrl,
+                  method: "GET"
+                 })
+                 .done(function(response){
+		  _data=response;
+                  _init();	
+		 });
 	}
 
 }
