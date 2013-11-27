@@ -147,7 +147,7 @@ function CitiesList (settings){
             method: "GET",
             success: function(response){
                 _data=response;
-                console.log(data);
+                console.log(_data);
                 _init();
             },
             error: function(jqXHR, exception, errorThrown){
