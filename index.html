@@ -16,14 +16,12 @@
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/models.js"></script>
 	<script type="text/javascript" src="js/controllers.js"></script>
-	<script type="text/javascript" src="data/cities.jsonp"></script>
 	<script type="text/javascript">
 	$(function(){
 		var citiesController= new CitiesView($("#placeForCities"));
 
 		var cities=new CitiesList({
-			data: citiesData, //data from data/cities.jsonp
-			//dataUrl: "data/cities.json", //use it to get data by AJAX call
+			dataUrl: "data/cities.json", //use it to get data by AJAX call
 			columnCount: 3, 
 			callBack: function (){ //this would be called after model has been changed
 				citiesController.showCities(this);//trigger controller to display the cities
