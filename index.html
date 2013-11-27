@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Cities markelov.vadim@gmail.com</title>
+	<link rel="stylesheet" type="text/css" href="styles/main.css">
+</head>
+<body>
+	<h1>Popular destinations</h1>
+
+	<div id="placeForCities">
+		<div class="cities"></div>
+		<div class="details"></div>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/models.js"></script>
+	<script type="text/javascript" src="js/controllers.js"></script>
+	<script type="text/javascript" src="data/cities.jsonp"></script>
+	<script type="text/javascript">
+	$(function(){
+		var citiesController= new CitiesView($("#placeForCities"));
+
+		var cities=new CitiesList({
+			data: citiesData, //data from data/cities.jsonp
+			//dataUrl: "data/cities.json", //use it to get data by AJAX call
+			columnCount: 3, 
+			callBack: function (){ //this would be called after model has been changed
+				citiesController.showCities(this);//trigger controller to display the cities
+			}
+		});
+
+		//put reference for cities model and controller to global scope
+		window.cities=cities;
+		window.citiesController=citiesController;
+
+		//examples of operations with model
+		//cities.insert({name:"aaa", count:35, content:"aaaa"});
+		//cities.update({name:"aaa", count:30, content:"aaaa"});
+		//cities.insert({name:"ccc", count:11, content:"cccc"}).insert({name:"bbb", count:3, content:"bbbbb"}).remove({name: "aaa"}); //chaining
+	});
+	</script>
+
+</body>
+</html>
