@@ -43,7 +43,7 @@ function CitiesView(parentElement){
 		for(var i=0,ilen=columns.length; i<ilen; i++){
 			var columnElement=$('<div class="column size1to'+ilen+'"></div>').appendTo(newCitiesList); //prepare column for items
 			for(var t=0, tlen=columns[i].length; t<tlen; t++){ //fill the columns dy cities
-				var cityElement=$('<a class="city" href="#'+columns[i][t].name+'"><span class="name">'+columns[i][t].name+'</span><span class="counter">('+_formatCounter(columns[i][t].count)+')</span></>').appendTo(columnElement);
+				var cityElement=$('<a class="city" href="#'+columns[i][t].name+'"><span class="name">'+columns[i][t].name+'</span><span class="counter">('+_formatCounter(columns[i][t].count)+')</span></a>').appendTo(columnElement);
 			}
 		}
 		_parent.find('.cities').replaceWith(newCitiesList); //put Cities list to the DOM
