@@ -38,5 +38,5 @@ below the list.
 
 - Only one JS library has been used to address cross browser issues. 
 
-Result: http://vadimmarkelov.github.io/test/
+Result: http://vadimmarkelov.github.io/handmadeMVC
 
