@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>TheList by markelov.vadim@gmail.com</title>
+	
+	<!-- build:css styles/main.css -->
+        <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+</head>
+<body>
+	<div id="placeForListItems">
+		
+		<div>
+			<form id="newItem">
+				<input name="name" type="text" placeholder="Add items to list" />
+				<input type="submit" value="Add" />
+			</form>
+		</div>
+
+		<div class="listItems"></div>
+		
+	</div>
+
+	<!-- build:js vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/es5-shim/es5-shim.js"></script>    
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<!-- endbower -->
+    <!-- endbuild -->
+
+	<!-- build:js app.js -->
+	<script src="js/models.js"></script>
+	<script src="js/controllers.js"></script>
+	<script src="js/main.js"></script>
+	<!-- endbuild -->
+	
+</body>
+</html>

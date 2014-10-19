@@ -1,21 +1,35 @@
+(function($){
 /**
- * Model for Cities
+ * Model for Items
  * @param settings {
-            data: citiesData, //use to init by darray of objects
+            data: itemsData, //use to init by darray of objects
             dataUrl: urlToJSON //use to init by data from URL
-            columnCount: 3, //number of columns to be used
             callBack: function (){} //this would be called after model has been changed
         }
- * @return instance of Cities model
+ * @return instance of ItemsList model
  */
-function CitiesList (settings){
+function ItemsList (settings){
 	var that=this; //local reference to instance of class
 	var _data;
-	var _columnCount=settings.columnCount || 3; //default number of columns is 3
-	var _columns=[];
-	var _callBack=settings.callBack || function (){}; //default callback function is empty
+	var _view=settings.view || null; //default view is empty
 
-	var _sortByName=function (){
+    var _filter=function (itemData) {
+        if(itemData.hasOwnProperty('name')) {
+            itemData['name']=$.trim(itemData['name']);
+        }
+    };
+
+    var _valid=function (itemData) {
+        if(!itemData.hasOwnProperty('name')) {
+            return false;
+        }
+        if(itemData['name']==='') {
+            return false;
+        }
+        return true;
+    };
+
+    var _sortByName=function (){
 		_data.sort(function (a, b){
   			var aName = a.name.toLowerCase();
   			var bName = b.name.toLowerCase(); 
@@ -25,47 +39,42 @@ function CitiesList (settings){
 
 	var _init=function () {
 		_sortByName();
-		_callBack.call(that);
-	}
+		if(_view){
+            _view.showItems(that);//trigger view to display the items
+        }
+	};
 
-	/**
-     * get all cities ...
-     * @return the copy of array of cities
+    /**
+     * get items count ...
+     * @return the count of items in list
      */
-     this.getCities=function(){return _data.slice();};
+     this.getCount=function(){return _data.length;};
+     
+    /**
+     * get all items ...
+     * @return the copy of array of items
+     */
+     this.getItems=function(){return _data.slice();};
      
 	/**
-     * get data about one city
-     * @param name string with name of city to search
-     * @return the array of cities
+     * get data about one item
+     * @param name string with name of item to search
+     * @return the array of items
      */
-     this.getCity=function(name){
+     this.getItem=function(name){
         return _data[that.searchBy('name',name)];
      };
      
 	/**
-     * get cities that has been distributed by the columns ...
-     * @return the array of columns of cities
-     */
-     this.getColumns=function(){
-     	var columns=[]	
-     	var itemsInOneColumn=Math.ceil(_data.length / _columnCount);
-     	for(var i=0; i<_columnCount; i++){
-     		columns.push(_data.slice(i*itemsInOneColumn, (i+1)*itemsInOneColumn));
-     	}
-     	return columns;
-     };
-
-	/**
-     * update model by new set of cities
-     * @param newData array of cities
+     * update model by new set of items
+     * @param newData array of items
      * @return reference to intance of class (for chaining)
      */
      this.updateAll=function(newData){
      	_data=[].slice.call(newData); //make local copy of data
      	_init();
         return that;
-     }
+     };
 
 
 	/**
@@ -77,24 +86,24 @@ function CitiesList (settings){
      this.searchBy=function(name, value){
      	var result=-1;
      	for(var i=0, len=_data.length; i<len; i++){
-     		if(_data[i][name]==value){
+     		if(_data[i][name]===value){
      			result=i;
      			break;
      		}
      	}
      	return result;
-     }
+     };
 
 	/**
      * update one item in the model (one that have the same name)
-     * @param itemData object with data about one city
+     * @param itemData object with data about one item
      * @return reference to intance of class (for chaining)
      */
      this.update=function(itemData){
-     	if(itemData.count<1) {
-     		that.remove(itemData);
-     		return that;
-     	}
+        _filter(itemData);
+        if(!_valid(itemData)) {
+            return that;
+        }
      	var indexToUpdate=that.searchBy('name', itemData.name);
      	if(indexToUpdate>-1){
      		_data[indexToUpdate]=itemData;
@@ -103,14 +112,18 @@ function CitiesList (settings){
     		that.insert(itemData);
      	}
      	return that;
-     }
+     };
 
 	/**
-     * insert new city to the model
-     * @param itemData object with data about one city
+     * insert new item to the model
+     * @param itemData object with data about one item
      * @return reference to intance of class (for chaining)
      */
      this.insert=function(itemData){
+        _filter(itemData);
+        if(!_valid(itemData)) {
+            return that;
+        }
      	var indexToUpdate=that.searchBy('name', itemData.name);
      	if(indexToUpdate<0){
      		_data.push(itemData);
@@ -119,11 +132,11 @@ function CitiesList (settings){
     		that.update(itemData);
      	}
      	return that;
-     }
+     };
 
 	/**
-     * remove one city from the model
-     * @param itemData object with data about one city
+     * remove one item from the model
+     * @param itemData object with data about one item
      * @return reference to intance of class (for chaining)
      */
      this.remove=function(itemData){
@@ -133,26 +146,30 @@ function CitiesList (settings){
      		_init();
      	}
      	return that;
-     }
+     };
 
 	//constructor
 	if(settings.data) {//use data as is
 		_data=[].slice.call(settings.data); //make local copy of data
 		_init();
-	} else {//load data from URL
+	   } else {//load data from URL
 		$.ajax({
             cache: false,
-            dataType: "json",
+            dataType: 'json',
             url: settings.dataUrl,
-            method: "GET",
+            method: 'GET',
             success: function(response){
                 _data=response;
                 _init();
             },
             error: function(jqXHR, exception, errorThrown){
-                //throwError('Data load has been failed!</h2> <h2>Error details: ('+jqXHR.status+') '+errorThrown)
+                console.log('Data load has been failed!</h2> <h2>Error details: ('+jqXHR.status+') '+errorThrown);
             }
 		});
 	}
 
 }
+
+window.ItemsList = ItemsList;
+
+})(jQuery);
