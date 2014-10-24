@@ -2,8 +2,7 @@
   "name": "TheList",
   "private": true,
   "dependencies": {
-    "es5-shim": "~3.1.0",
-    "jquery": "2.1.1"
+    "es5-shim": "~3.1.0"
   },
   "devDependencies": {}
 }

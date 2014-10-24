@@ -1,175 +1,123 @@
-(function($){
-/**
- * Model for Items
- * @param settings {
-            data: itemsData, //use to init by darray of objects
-            dataUrl: urlToJSON //use to init by data from URL
-            callBack: function (){} //this would be called after model has been changed
-        }
- * @return instance of ItemsList model
- */
-function ItemsList (settings){
-	var that=this; //local reference to instance of class
-	var _data;
-	var _view=settings.view || null; //default view is empty
+(function(){
 
-    var _filter=function (itemData) {
-        if(itemData.hasOwnProperty('name')) {
-            itemData['name']=$.trim(itemData['name']);
+//for prototypal inheritance
+var extendObj = function(childObj, parentObj) {
+    var TmpObj = function () {};
+    TmpObj.prototype = parentObj.prototype;
+    childObj.prototype = new TmpObj();
+    childObj.prototype.constructor = childObj;
+};
+
+/////////////////////////////
+//this is for adding observabily to object
+//when subscribe you should pass object with definition for specific events (update, create, remove)
+var Observable = function(){};
+Observable.prototype = {
+    subscribe: function(obj) {
+        if(!this._handlers) {
+            this._handlers=[];
+        }
+        this._handlers.push(obj);
+    },
+    unsubscribe: function(obj) {
+        if(!this._handlers) {
+            this._handlers=[];
+        }
+        for( var i = 0, len = this._handlers.length; i < len; i++ ) {
+          if( this._handlers[i] === obj ) {
+            this._handlers.splice( i, 1 );
+            return true;
+          }
+        }
+    return false;
+    },
+    notify: function(eventType, thisObj) {
+        if(!this._handlers) {
+            this._handlers=[];
+        }
+        var args = Array.prototype.slice.call( arguments, 2);
+        for( var i = 0, len = this._handlers.length; i < len; i++ ) {
+          this._handlers[i][eventType].apply( thisObj, args );
+          if(this.parent) { //bubble notification to parents
+            this.parent.notify(eventType, thisObj);
+          }
+        }
+    }
+};
+
+//////////////////////////////////////
+//Basic Model with gettter and setters
+var Model = function(initData){
+    this.create(initData);
+};
+
+extendObj(Model, Observable); //make it observable
+
+Model.prototype.get = function(propName){
+        return this[propName];
+    };
+Model.prototype.set = function(propName, value){
+        var changed = (value !== this[propName]);
+        this[propName]=value;
+        if (changed) {
+            this.notify('update', this); //notify subscribers about update
         }
     };
-
-    var _valid=function (itemData) {
-        if(!itemData.hasOwnProperty('name')) {
-            return false;
-        }
-        if(itemData['name']==='') {
-            return false;
-        }
-        return true;
-    };
-
-    var _sortByName=function (){
-		_data.sort(function (a, b){
-  			var aName = a.name.toLowerCase();
-  			var bName = b.name.toLowerCase(); 
-  			return ((aName < bName) ? -1 : ((aName > bName) ? 1 : 0));
-		});
-	};
-
-	var _init=function () {
-		_sortByName();
-		if(_view){
-            _view.showItems(that);//trigger view to display the items
-        }
-	};
-
-    /**
-     * get items count ...
-     * @return the count of items in list
-     */
-     this.getCount=function(){return _data.length;};
-     
-    /**
-     * get all items ...
-     * @return the copy of array of items
-     */
-     this.getItems=function(){return _data.slice();};
-     
-	/**
-     * get data about one item
-     * @param name string with name of item to search
-     * @return the array of items
-     */
-     this.getItem=function(name){
-        return _data[that.searchBy('name',name)];
-     };
-     
-	/**
-     * update model by new set of items
-     * @param newData array of items
-     * @return reference to intance of class (for chaining)
-     */
-     this.updateAll=function(newData){
-     	_data=[].slice.call(newData); //make local copy of data
-     	_init();
-        return that;
-     };
-
-
-	/**
-     * serach item by attribute
-     * @param name string that define name of attribute
-     * @param value string content of attribute
-     * @return the index of item (-1 if no item has been found)
-     */
-     this.searchBy=function(name, value){
-     	var result=-1;
-     	for(var i=0, len=_data.length; i<len; i++){
-     		if(_data[i][name]===value){
-     			result=i;
-     			break;
-     		}
-     	}
-     	return result;
-     };
-
-	/**
-     * update one item in the model (one that have the same name)
-     * @param itemData object with data about one item
-     * @return reference to intance of class (for chaining)
-     */
-     this.update=function(itemData){
-        _filter(itemData);
-        if(!_valid(itemData)) {
-            return that;
-        }
-     	var indexToUpdate=that.searchBy('name', itemData.name);
-     	if(indexToUpdate>-1){
-     		_data[indexToUpdate]=itemData;
-     		_init();
-     	} else {
-    		that.insert(itemData);
-     	}
-     	return that;
-     };
-
-	/**
-     * insert new item to the model
-     * @param itemData object with data about one item
-     * @return reference to intance of class (for chaining)
-     */
-     this.insert=function(itemData){
-        _filter(itemData);
-        if(!_valid(itemData)) {
-            return that;
-        }
-     	var indexToUpdate=that.searchBy('name', itemData.name);
-     	if(indexToUpdate<0){
-     		_data.push(itemData);
-     		_init();
-     	} else {
-    		that.update(itemData);
-     	}
-     	return that;
-     };
-
-	/**
-     * remove one item from the model
-     * @param itemData object with data about one item
-     * @return reference to intance of class (for chaining)
-     */
-     this.remove=function(itemData){
-     	var indexToUpdate=that.searchBy('name', itemData.name);
-     	if(indexToUpdate>-1){
-    		_data.splice(indexToUpdate,1);
-     		_init();
-     	}
-     	return that;
-     };
-
-	//constructor
-	if(settings.data) {//use data as is
-		_data=[].slice.call(settings.data); //make local copy of data
-		_init();
-	   } else {//load data from URL
-		$.ajax({
-            cache: false,
-            dataType: 'json',
-            url: settings.dataUrl,
-            method: 'GET',
-            success: function(response){
-                _data=response;
-                _init();
-            },
-            error: function(jqXHR, exception, errorThrown){
-                console.log('Data load has been failed!</h2> <h2>Error details: ('+jqXHR.status+') '+errorThrown);
+Model.prototype.create = function(obj){
+        for(var i in obj){
+            if(obj.hasOwnProperty(i)) {
+                this[i]=obj[i];
             }
-		});
-	}
+        }
+        this.notify('create', this); //notify subscribers about create
+    };
+Model.prototype.remove = function(){
+        this.notify('remove', this); //just a gateway to send remove notification
+    };
 
-}
 
-window.ItemsList = ItemsList;
+////////////////////////////
+// This is one item in the list.
+var ListItem = function(itemText, parent){
+    this.create({ //it use method from basic model to create itself
+        parent: parent,
+        text: itemText,
+    });
+};
 
-})(jQuery);
+extendObj(ListItem, Model); //list item shoud behave like regular model
+
+
+//////////////////////////////
+//This is the collection of items
+var List = function(){
+    var args = Array.prototype.slice.call( arguments, 0); //fill collection by items from params
+    this.items = [];
+
+    for(var i in args){
+        this.add(args[i]); //put items in collection
+    }
+
+    this.create({count: args.length}); //init inself by params. it use basic model method to create itself.
+
+    this.subscribe({
+        update: function(){ //subscribe for notifications about changes inside collection (add, remove, etc.)
+            this.set('count', this.items.length); //make shure to know exact count of items
+        }
+    });
+};
+
+extendObj(List, Model); //List of items should behave like regular model
+
+List.prototype.add = function(itemText){ //method for adding new item to list
+        this.items.push(new ListItem(itemText, this)); 
+        this.notify('update', this);
+    };
+List.prototype.remove = function(index){ //method to remove
+        this.items[index].remove(); //ask model to remove
+        this.items.splice(index,1); //remove reference to it
+        this.notify('update', this);
+    };
+
+window.List = List;
+})();

@@ -12,17 +12,14 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'app/bower_components/jquery/dist/jquery.js',
             'app/bower_components/es5-shim/es5-shim.js',
-            'app/js/models.js',
-            'app/js/controllers.js',
-            'app/js/main.js',
+            'app/js/*.js',
 
-             'test/spec/**/*.js'
+            'test/spec/**/*.js'
         ],
 
         // list of files / patterns to exclude
-        exclude: [],
+        exclude: ['app/js/main.js'],
 
         // web server port
         port: 9001,
