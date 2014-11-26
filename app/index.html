@@ -2,39 +2,133 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>TheList by markelov.vadim@gmail.com</title>
+	<title>Handmade MVC by markelov.vadim@gmail.com</title>
 	
 	<!-- build:css styles/main.css -->
-        <link rel="stylesheet" href="styles/main.css">
+	<!-- bower:css -->
+	<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+	<!-- endbower -->
+    <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
 
 </head>
 <body>
-	<div id="placeForListItems">
-		
-		<div>
-			<form id="newItem">
-				<input name="name" type="text" placeholder="Add items to list" />
-				<input type="submit" value="Add" />
-			</form>
-		</div>
+	<section class="rooms">
+	</section>
 
-		<div class="listItems"></div>
-		
-	</div>
+	<script id="roomsTemplate" type="text/x-handlebars-template">
+		<h2>Select Your Room</h2>
+		<form method="post" action="" class="rooms_table_form">
+			<table class="rooms_table" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th class="room_name">
+							Room Name
+						</th>
+						<th class="room_occupancy sortable" data-sortable-by="occupancy">
+							Occupancy
+							{{#IfEqual orderField 'occupancy'}}
+								{{#IfEqual orderDirection true}}<i class="fa fa-chevron-circle-down"></i>{{/IfEqual}}
+								{{#IfEqual orderDirection false}}<i class="fa fa-chevron-circle-up"></i>{{/IfEqual}}
+							{{else}}
+								<i class="fa fa-chevron-circle-right"></i>
+							{{/IfEqual}}
+						</th>
+						<th class="room_price sortable" data-sortable-by="price">
+							Price per Room
+							{{#IfEqual orderField 'price'}}
+								{{#IfEqual orderDirection true}}<i class="fa fa-chevron-circle-down"></i>{{/IfEqual}}
+								{{#IfEqual orderDirection false}}<i class="fa fa-chevron-circle-up"></i>{{/IfEqual}}
+							{{else}}
+								<i class="fa fa-chevron-circle-right"></i>
+							{{/IfEqual}}
+						</th>
+						<th class="room_quantity">
+							No. Rooms
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each rooms}}
+						<tr class="one_room">
+							<td class="room_name">{{this.name}}</td>
+							<td class="room_occupancy">{{this.occupancy}}</td>
+							<td class="room_price">&euro;{{this.price}}</td>
+							<td class="room_quantity">
+								<select name="room[]" data-index="{{@index}}">
+									{{#times this.maxCount}}
+										<option value="{{this}}" {{#IfEqual this ../count}}selected="selected"{{/IfEqual}}>{{this}}</option>
+									{{/times}}
+								</select>
+							</td>
+						</tr>
+					{{/each}}																					
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="4">
+							{{#if totalRooms}}
+							Total: {{totalRooms}} room(s) with occupancy of {{totalPeople}} place(s) for &euro;{{totalPrice}}
+							{{/if}}
+							<button class="button" type="submit" {{#unless totalRooms}}disabled="disabled"{{/unless}}>Book Now</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</form>
+	</script>
+
+
+	<section class="reviews">
+	</section>
+
+	<script id="reviewsTemplate" type="text/x-handlebars-template">
+		<h2 class="clickable">
+			Reviews 
+			{{#IfEqual order true}}<i class="fa fa-chevron-circle-down"></i>{{/IfEqual}}
+			{{#IfEqual order false}}<i class="fa fa-chevron-circle-up"></i>{{/IfEqual}}
+			{{#IfUndefined order}}<i class="fa fa-chevron-circle-right"></i>{{/IfUndefined}}
+		</h2>
+		<ul class="reviews_list">
+			{{#each items}}
+				<li class="one_review">
+					<strong class="review_score">{{this.score}}</strong>
+					<blockquote class="review_content">{{this.text}}
+						<cite>{{this.user}}</cite>
+					</blockquote>
+				</li>
+			{{/each}}	
+		</ul>
+		<ul class="pagination">
+			{{#each pageRef}}
+				<li data-page-index="{{@index}}" class="{{#IfEqual @index ../currentPage}}active{{/IfEqual}}">{{plus1 @index}}</li>
+			{{/each}}
+		</ul>
+	</script>
 
 	<!-- build:js vendor.js -->
     <!-- bower:js -->
-    <script src="bower_components/es5-shim/es5-shim.js"></script>    
-	<!-- endbower -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/handlebars/handlebars.js"></script>
+    <!-- endbower -->
     <!-- endbuild -->
 
 	<!-- build:js app.js -->
-	<script src="js/helpers.js"></script>
-	<script src="js/models.js"></script>
-	<script src="js/views.js"></script>
-	<script src="js/controllers.js"></script>
-	<script src="js/main.js"></script>
+	<script src="shared/helpers.js"></script>
+	<script src="shared/oop.js"></script>
+	
+	<script src="features/rooms/rooms_data.js"></script>
+	<script src="features/rooms/models.js"></script>
+	<script src="features/rooms/views.js"></script>
+	<script src="features/rooms/controllers.js"></script>
+	
+	<script src="features/reviews/reviews_data.js"></script>
+	<script src="features/reviews/models.js"></script>
+	<script src="features/reviews/views.js"></script>
+	<script src="features/reviews/controllers.js"></script>
+	
+	<script src="app.js"></script>
 	<!-- endbuild -->
 	
 </body>

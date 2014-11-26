@@ -18,6 +18,17 @@ gulp.task('styles', function () {
         });
 });
 
+// Copy the fonts
+gulp.task('fonts', function () {
+    return gulp.src(mainBowerFiles())
+        .pipe($.filter('**/*.{eot,svg,ttf,woff}'))
+        .pipe($.flatten())
+        .pipe(gulp.dest('dist/fonts'))
+        .pipe($.size()).on('error', function (e) {
+            console.log(e);
+        });
+});
+
 // Check the code quality of the scripts
 gulp.task('scripts', function () {
     return gulp.src(['app/**/*.js', '!app/bower_components{,/**}'])
@@ -121,7 +132,7 @@ gulp.task('tdd', function () {
 });
 
 
-gulp.task('build', ['html', 'extras'], function () {
+gulp.task('build', ['html', 'fonts', 'extras'], function () {
     console.log('build done!');
 });
 

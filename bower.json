@@ -1,8 +1,11 @@
 {
-  "name": "TheList",
+  "name": "HandmadeMVC",
   "private": true,
   "dependencies": {
-    "es5-shim": "~3.1.0"
+    "es5-shim": "~3.1.0",
+    "jquery": "~1.11.1",
+    "handlebars": "~2.0.0",
+    "font-awesome": "~4.1.0"
   },
   "devDependencies": {}
 }

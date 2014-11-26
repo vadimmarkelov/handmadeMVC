@@ -4,6 +4,10 @@
 module.exports = function (config) {
     config.set({
 
+        preprocessors: {
+            '{app,app/!(bower_components|plugins|modules)/**}/*.js': 'coverage'
+        },
+
         // base path, that will be used to resolve files and exclude
         basePath: '',
 
@@ -13,7 +17,10 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             'app/bower_components/es5-shim/es5-shim.js',
-            'app/js/*.js',
+            'app/bower_components/jquery/dist/jquery.js',
+            'app/bower_components/handlebars/handlebars.js',
+            'app/shared/**/*.js',
+            'app/features/**/*.js',
 
             'test/spec/**/*.js'
         ],
@@ -34,7 +41,8 @@ module.exports = function (config) {
 
         plugins: [
             'karma-jasmine',
-            'karma-chrome-launcher'
+            'karma-phantomjs-launcher',
+            'karma-coverage'
         ],
 
         colors: true,
@@ -47,11 +55,17 @@ module.exports = function (config) {
         // - Safari (only Mac)
         // - PhantomJS
         // - IE (only Windows)
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
 
         // Continuous Integration mode
         // if true, it capture browsers, run tests and exit
-        singleRun: false
+        singleRun: false,
+
+        // Test coverage
+        reporters: ['progress', 'coverage'],
+        // Test coverage reporter
+        coverageReporter: { type : 'text' }
+
 
     });
 };
