@@ -36,3 +36,4 @@ Follow these steps to run the local development setup of the front-end:
 5. Build project for production: ```gulp```
 
 Example of code that has been built is located in DIST folder. 
+Live example http://vadimmarkelov.github.io/handmadeMVC/
